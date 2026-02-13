@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Valentine?</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      min-height:100dvh;
+      display:grid;
+      place-items:center;
+      padding:16px;
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 700px at 20% 10%, #ffe1ec 0%, transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, #ffeef5 0%, transparent 55%),
+        radial-gradient(800px 600px at 50% 100%, #fff6fb 0%, #fff 60%);
+    }
+
+    .card{
+      width:min(620px, 94vw);
+      background:rgba(255,255,255,0.86);
+      border:1px solid rgba(255,45,111,0.22);
+      border-radius:28px;
+      padding:28px 20px 22px;
+      text-align:center;
+      box-shadow:0 22px 70px rgba(0,0,0,0.10);
+      position:relative;
+      backdrop-filter: blur(8px);
+    }
+
+    h1{
+      margin: 6px 0 10px;
+      font-size: clamp(26px, 5vw, 42px);
+      color:#ff2d6f;
+      line-height:1.1;
+    }
+
+    p{
+      margin:0 0 14px;
+      color:#3f3f3f;
+      font-size:16px;
+      line-height:1.45;
+    }
+
+    .stage{
+      margin-top:12px;
+      position:relative;
+      height:180px;
+      border-radius:22px;
+      border:1px solid rgba(0,0,0,0.06);
+      background:
+        radial-gradient(900px 180px at 50% 0%, rgba(255,45,111,0.12), transparent 65%),
+        rgba(255,255,255,0.6);
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      padding:16px;
+    }
+
+    .buttons{
+      width:100%;
+      max-width:520px;
+      height:120px;
+      position:relative;
+      display:grid;
+      place-items:center;
+    }
+
+    button{
+      border:0;
+      padding:14px 22px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:16px;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    }
+    button:active{ transform: scale(0.98); }
+
+    #yesBtn{
+      background: linear-gradient(135deg, #ff2d6f, #ff6fa0);
+      color:#fff;
+      box-shadow:0 14px 34px rgba(255,45,111,0.25);
+    }
+    #yesBtn:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+
+    /* Smooth motion, we move via transform */
+    #noBtn{
+      background:#f2f2f2;
+      color:#333;
+      box-shadow:0 12px 26px rgba(0,0,0,0.12);
+      position:absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+    }
+
+    .plea{
+      position:absolute;
+      left:50%;
+      top:12px;
+      transform: translateX(-50%) translateY(0) scale(0.98);
+      background:#fff0f6;
+      border:1px solid rgba(255,45,111,0.25);
+      color:#c1154d;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:14px;
+      opacity:0;
+      pointer-events:none;
+      white-space: nowrap;
+      max-width:92%;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    @keyframes pleaPop {
+      0%   { opacity:0; transform: translateX(-50%) translateY(0) scale(0.96); }
+      35%  { opacity:1; transform: translateX(-50%) translateY(-6px) scale(1.02); }
+      100% { opacity:0; transform: translateX(-50%) translateY(-10px) scale(1.00); }
+    }
+    .plea.show { animation: pleaPop 900ms ease forwards; }
+
+    .result{
+      margin-top:14px;
+      font-size:18px;
+      font-weight:900;
+      color:#1f1f1f;
+      display:none;
+    }
+    .result.show{ display:block; }
+
+    .sparkles{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      border-radius:28px;
+    }
+    .floaty{
+      position:absolute;
+      opacity:0;
+      animation: floatUp 950ms ease forwards;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.10));
+      font-size: 18px;
+    }
+    @keyframes floatUp{
+      0%   { transform: translateY(0) scale(0.9) rotate(0deg); opacity:0; }
+      20%  { opacity:1; }
+      100% { transform: translateY(-170px) scale(1.15) rotate(10deg); opacity:0; }
+    }
+
+    #noBtn.gliding{
+      transition: transform 420ms cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .yes-mode #noBtn { display:none; }
+    .yes-mode #yesBtn { transform: scale(1.08); }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="sparkles" id="sparkles"></div>
+
+    <h1>Will you be my Valentine? 💘</h1>
+    <p>Choose wisely or I'll brick your device, JUST KIDDING HWHAW.</p>
+
+    <div class="stage">
+      <div class="plea" id="plea">pwease 🥺</div>
+
+      <div class="buttons" id="buttons">
+        <button id="yesBtn">Yes 💞</button>
+        <button id="noBtn" aria-label="No">No 😅</button>
+      </div>
+    </div>
+
+    <div class="result" id="result">yey see you tomorrow, lav yah &lt;3</div>
+
+    <!-- Audio files should be in the same folder as this HTML -->
+    <audio id="song" preload="auto">
+      <source src="valentine.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="sfxYay" preload="auto">
+      <source src="children-yay.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="sfxConfetti" preload="auto">
+      <source src="confetti.mp3" type="audio/mpeg" />
+    </audio>
+  </div>
+
+  <script>
+    const card = document.getElementById("card");
+    const buttons = document.getElementById("buttons");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const plea = document.getElementById("plea");
+    const result = document.getElementById("result");
+    const sparkles = document.getElementById("sparkles");
+
+    const song = document.getElementById("song");
+    const sfxYay = document.getElementById("sfxYay");
+    const sfxConfetti = document.getElementById("sfxConfetti");
+
+    const pleaSequence = [
+      "pwease 🥺",
+      "pwease kerrbear 🥺",
+      "PLEASEEE KERRBEAR 😭"
+    ];
+
+    let noAttempts = 0;
+    let isYes = false;
+    let busy = false;
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function showPlea() {
+      const msg = pleaSequence[Math.min(noAttempts, pleaSequence.length - 1)];
+      plea.textContent = msg;
+      plea.classList.remove("show");
+      void plea.offsetWidth;
+      plea.classList.add("show");
+    }
+
+    function burst(count = 14) {
+      const rect = card.getBoundingClientRect();
+      const emojis = ["💗","💖","💘","💞","💕","✨","🫶"];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.className = "floaty";
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (Math.random() * rect.width) + "px";
+        el.style.top = (rect.height - 40 - Math.random() * 20) + "px";
+        el.style.fontSize = (16 + Math.random() * 14) + "px";
+        el.style.animationDelay = (Math.random() * 180) + "ms";
+        sparkles.appendChild(el);
+        setTimeout(() => el.remove(), 1200);
+      }
+    }
+
+    function dodgeNo() {
+      if (isYes || busy) return;
+      busy = true;
+
+      showPlea();
+      noAttempts++;
+
+      const area = buttons.getBoundingClientRect();
+      const noR = noBtn.getBoundingClientRect();
+      const yesR = yesBtn.getBoundingClientRect();
+      const pad = 8;
+
+      const maxX = area.width - noR.width - pad;
+      const maxY = area.height - noR.height - pad;
+
+      // Try multiple times to avoid overlapping YES
+      let x = pad, y = pad;
+      for (let tries = 0; tries < 18; tries++) {
+        x = clamp(pad + Math.random() * maxX, pad, maxX);
+        y = clamp(pad + Math.random() * maxY, pad, maxY);
+
+        const candidate = {
+          left: area.left + x,
+          top: area.top + y,
+          right: area.left + x + noR.width,
+          bottom: area.top + y + noR.height
+        };
+
+        const buffer = 16;
+        const yesBox = {
+          left: yesR.left - buffer,
+          top: yesR.top - buffer,
+          right: yesR.right + buffer,
+          bottom: yesR.bottom + buffer
+        };
+
+        const overlaps =
+          !(candidate.right < yesBox.left ||
+            candidate.left > yesBox.right ||
+            candidate.bottom < yesBox.top ||
+            candidate.top > yesBox.bottom);
+
+        if (!overlaps) break;
+      }
+
+      // Convert to transform offsets relative to center position
+      const centerX = area.width / 2 - noR.width / 2;
+      const centerY = area.height / 2 - noR.height / 2;
+      const dx = x - centerX;
+      const dy = y - centerY;
+
+      noBtn.classList.add("gliding");
+      noBtn.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+      if (noAttempts % 2 === 0) burst(10);
+
+      setTimeout(() => { busy = false; }, 120);
+    }
+
+    // Works on desktop and mobile
+    ["pointerenter", "pointerdown"].forEach(evt => {
+      noBtn.addEventListener(evt, (e) => {
+        e.preventDefault?.();
+        dodgeNo();
+      }, { passive: false });
+    });
+
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      dodgeNo();
+    });
+
+    yesBtn.addEventListener("click", async () => {
+      isYes = true;
+      card.classList.add("yes-mode");
+      result.classList.add("show");
+      burst(24);
+      yesBtn.textContent = "YESSS 💖";
+
+      // Sound effects first
+      try { sfxYay.currentTime = 0; await sfxYay.play(); } catch (e) {}
+      setTimeout(() => {
+        try { sfxConfetti.currentTime = 0; sfxConfetti.play(); } catch (e) {}
+      }, 120);
+
+      // Then the main song
+      setTimeout(async () => {
+        try {
+          song.currentTime = 0;
+          await song.play();
+        } catch (e) {}
+      }, 250);
+    });
+
+    // Initial placement
+    requestAnimationFrame(() => {
+      noBtn.classList.add("gliding");
+      noBtn.style.transform = `translate(calc(-50% + 130px), calc(-50% + 18px))`;
+    });
+  </script>
+</body>
+</html>
